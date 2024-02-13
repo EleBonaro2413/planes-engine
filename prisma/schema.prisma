@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leaderOf       Project[] @relation("LeaderOf")
+  collaboratorOf Project[] @relation("CollaboratorOf")
+}
+
+model Project {
+  id            String      @id @default(cuid())
+  name          String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  procedures    Procedure[]
+  leader        User        @relation("LeaderOf", fields: [leaderId], references: [id])
+  leaderId      String
+  places        Json
+  transitions   Json
+  requirements  Json
+  collaborators User[]      @relation("CollaboratorOf")
+}
+
+model Procedure {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  state     Json
+
+  projectId String
+  Project   Project? @relation(fields: [projectId], references: [id])
+}
