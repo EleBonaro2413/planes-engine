@@ -1,12 +1,9 @@
-// @TODO:  Implement the CRUD operations for the user entity [@ramayala]
-
 import { ErrorCode } from "~/shared/codeError";
 import { User } from "~/types";
 import { create, get, getAll } from "../repository/InMemory";
 
 export async function createUser(user: User){
     const created = await create(user).catch((reason: Error) => {
-        console.error(reason);
         throw new ErrorCode(500, "Error at create user")
     })
         return created           

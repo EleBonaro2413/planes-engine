@@ -16,13 +16,6 @@ const UsersInMemory: Array<User> = [
     email: "jhonDutton@gmail.com",
     password: "123",
   
-  },{
-    age: 52,
-    id: "117",
-    name: "Master Chief",
-    email: "MasterPechosTitanicos@gmail.com",
-    password: "lovuC0rt4na ",
-  
   },
 ] satisfies User[];
 
@@ -37,7 +30,7 @@ export const create = (user: User) => {
 };
 
 export const get = (id: string) => {
-  return UsersInMemory.find((u: User) => u.id === id);
+  return UsersInMemory.find((user: User) => user.id === id);
 };
 
 export const getAll = () => {
