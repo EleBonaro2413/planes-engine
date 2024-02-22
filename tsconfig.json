@@ -2,9 +2,9 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "strict": true,
+    "lib": ["ESNext"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "types": ["bun-types"],
     "paths": {
       "~/*": ["./src/*"]
     }

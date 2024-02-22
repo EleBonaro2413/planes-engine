@@ -47,7 +47,7 @@ export const createUserRoute = createRoute({
   path: "/",
   tags: ["users"],
   request: {
-    body: {
+    body: {  
       content: {
         "application/json": {
           schema: UserSchema,

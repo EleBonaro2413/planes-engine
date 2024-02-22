@@ -1,6 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { getUserRoute, createUserRoute, getAllUsersRoute } from "./routes";
-import { getAllUsers, getUser } from "../repository/InMemory";
+import { get, getAll } from "../repository/InMemory";
 import { HTTPException } from "hono/http-exception";
 
 const app = new OpenAPIHono();
@@ -10,7 +10,7 @@ app.openapi(
   getUserRoute,
   (c) => {
     const { id } = c.req.valid("param");
-    const user = getUser(id);
+    const user = get(id);
     if (!user) {
       throw new HTTPException(404, { message: "User not found" });
     }
@@ -25,7 +25,7 @@ app.openapi(
 );
 
 app.openapi(getAllUsersRoute, (c) => {
-  return c.json(getAllUsers());
+  return c.json(getAll());
 });
 
 app.openapi(createUserRoute, (c) => {
