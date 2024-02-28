@@ -50,7 +50,7 @@ export const createUserRoute = createRoute({
     body: {  
       content: {
         "application/json": {
-          schema: UserSchema,
+          schema: UserSchema.omit({id: true, createdAt: true, updatedAt: true}),
         },
       },
       required: true,
@@ -69,4 +69,3 @@ export const createUserRoute = createRoute({
   },
 });
 
-//@TODO: Add new routes to handle the CRUD operations
