@@ -10,7 +10,6 @@ const ParamsSchema = z.object({
   }),
 });
 
-//@TODO: Add more properties to match the User entity
 const UserSchema = z
   .object({
     id: z.string().openapi({
@@ -25,9 +24,12 @@ const UserSchema = z
     name: z.string().openapi({
       example: "John Doe",
     }),
-    age: z.number().openapi({
-      example: 42,
+    createdAt: z.coerce.date().openapi({
+      example: "2023-09-07T07:19:51.128Z"
     }),
+    updatedAt: z.coerce.date().openapi({
+      example: "2023-09-07T07:19:51.128Z"
+    })
     
   })
   .openapi("User");

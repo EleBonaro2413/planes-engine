@@ -1,36 +1,39 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { getUserRoute, createUserRoute, getAllUsersRoute } from "./routes";
-import { get, getAll } from "../repository/InMemory";
+import {getById, getAll, create} from "../repository/database"
 import { HTTPException } from "hono/http-exception";
+import { createUser, findAllUsers, findUserById } from "../domain/crud";
 
 const app = new OpenAPIHono();
 
-//@TODO: Add more controllers to handle the crud operations
+
 app.openapi(
   getUserRoute,
   (c) => {
     const { id } = c.req.valid("param");
-    const user = get(id);
+    const user = findUserById(id);
+    console.log(user)
     if (!user) {
       throw new HTTPException(404, { message: "User not found" });
     }
     return c.json(user);
   },
   (result, c) => {
-    console.log(result);
     if (!result.success) {
       return c.json({ message: "User not found" });
     }
   }
+  
 );
 
-app.openapi(getAllUsersRoute, (c) => {
-  return c.json(getAll());
+app.openapi(getAllUsersRoute, async (c) => {
+  return c.json(await findAllUsers());
 });
 
 app.openapi(createUserRoute, (c) => {
   const userData = c.req.valid("json");
-  return c.json(userData, 201);
+  const user = createUser(userData)
+  return c.json(user, 201);
 });
 
 export const userApp = app;
