@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 let user: Prisma.UserCreateInput;
 
 export async function create(data: User) {
-  console.log(data)
   await prisma.user.create({ data });
 }
 

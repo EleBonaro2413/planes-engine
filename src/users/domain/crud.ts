@@ -3,7 +3,6 @@ import { User } from "~/types";
 import { create,getById as getUserById, getAll as getAllUsers, update} from "../repository/database";
 
 export async function createUser(data: Pick<User, "email"| "name" | "password">){
-    console.log(data)
     const created = await create(data).catch((reason: Error) => {
         throw new ErrorCode(500, "Error at create user")
     })
