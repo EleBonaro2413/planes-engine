@@ -6,7 +6,7 @@ const ParamsSchema = z.object({
       name: "id",
       in: "path",
     },
-    example: "123",
+    example: "clt4uksj232jb",
   }),
 });
 

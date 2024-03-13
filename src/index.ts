@@ -7,7 +7,7 @@ import { logger } from "hono/logger";
 import { proceduresApp } from "./procedures/app";
 import { ErrorCode } from "./shared/codeError";
 import { HTTPException } from "hono/http-exception";
-
+import { Prisma } from "@prisma/client";
 const app = new OpenAPIHono();
 
 app.route("/users", userApp);
@@ -33,14 +33,17 @@ app.doc("/doc", {
   },
 });
 
-app.onError((err, c) => {
-  if (err instanceof ErrorCode) {
-    return new HTTPException(err.code, {
-      message: err.message,
-    }).getResponse();
+app.onError((err) => {
+  if (err instanceof HTTPException) {
+    return err.getResponse()
   }
-
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === "P2025") {
+      return new HTTPException(404).getResponse();
+    }
+  }
   return new HTTPException(500).getResponse();
+  
 });
 
 console.log(`🔥 Server running on http://localhost:3004 
