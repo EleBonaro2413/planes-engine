@@ -10,17 +10,26 @@ export async function create(data: User) {
   await prisma.user.create({ data });
 }
 
-export  const getById = async (id: string) => {
-    const user = await prisma.user.findUnique({
+export const getById = async (id: string) => {
+    return await prisma.user.findUnique ({
       where: {
         id: id
       }
     })
-    console.log(user)
-    return user
 };
 
 export const getAll = async () => {
   const users = await prisma.user.findMany();
   return users
 };
+
+
+export const update = (id: string, data: Pick<User, "name" | "password">) => { 
+      const updateUser = prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: data
+      })
+    return updateUser
+}

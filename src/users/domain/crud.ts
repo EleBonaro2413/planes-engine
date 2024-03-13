@@ -1,6 +1,6 @@
 import { ErrorCode } from "~/shared/codeError";
 import { User } from "~/types";
-import { create,getById as getUserById, getAll as getAllUsers} from "../repository/database";
+import { create,getById as getUserById, getAll as getAllUsers, update} from "../repository/database";
 
 export async function createUser(data: Pick<User, "email"| "name" | "password">){
     console.log(data)
@@ -15,4 +15,8 @@ export function findUserById(id: string) {
 
 export function findAllUsers(){
     return getAllUsers()
+}
+
+export function updateUser(id: string, data: Pick<User, "name"| "password">){
+        return update(id,data)
 }

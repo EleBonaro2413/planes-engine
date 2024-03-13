@@ -68,4 +68,36 @@ export const createUserRoute = createRoute({
     },
   },
 });
-
+export const updateUserRoute = createRoute({
+  method: "patch",
+  path: "/{id}",
+  tags: ["users"],
+  request: {
+    params: ParamsSchema,
+    body: {  
+      content: {
+        "application/json": {
+          schema: UserSchema.pick({name: true, password: true}),
+        },
+      },
+      required: true,
+      description: "User info to update",
+    },
+  },
+  responses:{
+    200: {
+      content: {
+        "application/json": {
+          schema: UserSchema,
+        },
+      },
+      description: "Updated user information",
+    },
+    404: {
+      description: "User not found",
+    },
+    500: {  
+      description: "Internal server error",
+    },
+  }
+})
