@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 let user: Prisma.UserCreateInput;
 
 export async function create(data: User) {
-  console.log(data)
   await prisma.user.create({ data });
 }
 
@@ -24,8 +23,8 @@ export const getAll = async () => {
 };
 
 
-export const update = (id: string, data: Pick<User, "name" | "password">) => { 
-      const updateUser = prisma.user.update({
+export const update = async (id: string, data: Pick<User, "name" | "password">) => { 
+      const updateUser = await prisma.user.update({
         where: {
           id: id,
         },
@@ -33,3 +32,11 @@ export const update = (id: string, data: Pick<User, "name" | "password">) => {
       })
     return updateUser
 }
+
+export const softDelete = async ( id: string) => {
+    const dltUser = await prisma.user.update({
+     where: {id},
+      data: {deleteAt: new Date() }
+    })
+    return dltUser
+} 

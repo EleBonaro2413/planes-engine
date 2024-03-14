@@ -1,9 +1,8 @@
 import { ErrorCode } from "~/shared/codeError";
 import { User } from "~/types";
-import { create,getById as getUserById, getAll as getAllUsers, update} from "../repository/database";
+import { create,getById as getUserById, getAll as getAllUsers, update, delUser, softDelete} from "../repository/database";
 
 export async function createUser(data: Pick<User, "email"| "name" | "password">){
-    console.log(data)
     const created = await create(data).catch((reason: Error) => {
         throw new ErrorCode(500, "Error at create user")
     })
@@ -19,4 +18,8 @@ export function findAllUsers(){
 
 export function updateUser(id: string, data: Pick<User, "name"| "password">){
         return update(id,data)
+}
+
+export function deleteUser(id: string){
+    return softDelete(id);
 }

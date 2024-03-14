@@ -4,11 +4,13 @@ import {
   createUserRoute,
   getAllUsersRoute,
   updateUserRoute,
+  deleteUserRoute,
 } from "./routes";
 import { getById, getAll, create, update } from "../repository/database";
 import { HTTPException } from "hono/http-exception";
 import {
   createUser,
+  deleteUser,
   findAllUsers,
   findUserById,
   updateUser,
@@ -52,4 +54,11 @@ app.openapi(updateUserRoute, async (c) => {
   const userinfo = await updateUser(id, userJson);
   return c.json(userinfo, 200);
 });
+
+app.openapi(deleteUserRoute, async (c)=> {
+    const {id} = c.req.valid("param")
+    const user = await deleteUser(id)
+    return c.json(user)
+})
 export const userApp = app;
+

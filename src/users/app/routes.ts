@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { ParamsSchema, UserSchema } from "./schemas";
+import { create } from "ts-node";
 
 export const getUserRoute = createRoute({
   method: "get",
@@ -98,6 +99,31 @@ export const updateUserRoute = createRoute({
     },
     500: {  
       description: "Internal server error",
+    },
+  }
+})
+
+export const deleteUserRoute =  createRoute({
+  method: "delete",
+  path: "/{id}",
+  tags: ["users"],
+  request: {
+    params: ParamsSchema
+  },
+  responses:{
+    200: {
+      content: {
+        "application/json": {
+          schema: UserSchema,
+        },
+      },
+      description: "Delete user information",
+    },
+    404: {
+      description: "User not found",
+    },
+    500: {  
+      description: "Internal sersver error",
     },
   }
 })
