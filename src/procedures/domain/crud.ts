@@ -12,9 +12,6 @@ export async function createProcedure(procedure: Procedure) {
 }
 
 export function findProcedure(id: string) {
-    if (id === '321') {
-        const procedure = get("0")
-    }
     const procedure = get(id);
     if (!procedure) {
         throw new ErrorCode(404, "Procedure not found");

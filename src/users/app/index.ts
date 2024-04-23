@@ -1,4 +1,4 @@
-import { OpenAPIHono, z } from "@hono/zod-openapi";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import {
   getUserRoute,
   createUserRoute,
@@ -6,7 +6,6 @@ import {
   updateUserRoute,
   deleteUserRoute,
 } from "./routes";
-import { getById, getAll, create, update } from "../repository/database";
 import { HTTPException } from "hono/http-exception";
 import {
   createUser,
@@ -15,10 +14,7 @@ import {
   findUserById,
   updateUser,
 } from "../domain/crud";
-import { swaggerUI } from "@hono/swagger-ui";
-import { zValidator } from "@hono/zod-validator";
-import { UserSchema } from "./schemas";
-import { Prisma } from "@prisma/client";
+
 const app = new OpenAPIHono();
 
 app.openapi(
@@ -39,12 +35,13 @@ app.openapi(
 );
 
 app.openapi(getAllUsersRoute, async (c) => {
-  return c.json(await findAllUsers());
+  const { name, email } = c.req.valid("query");
+  return c.json(await findAllUsers({ filters: { name } }));
 });
 
-app.openapi(createUserRoute, (c) => {
+app.openapi(createUserRoute, async (c) => {
   const userData = c.req.valid("json");
-  const user = createUser(userData);
+  const user = await createUser(userData);
   return c.json(user, 201);
 });
 
@@ -55,10 +52,10 @@ app.openapi(updateUserRoute, async (c) => {
   return c.json(userinfo, 200);
 });
 
-app.openapi(deleteUserRoute, async (c)=> {
-    const {id} = c.req.valid("param")
-    const user = await deleteUser(id)
-    return c.json(user)
+app.openapi(deleteUserRoute, async (c) => {
+  const { id } = c.req.valid("param")
+  const user = await deleteUser(id)
+  return c.json(user)
 })
 export const userApp = app;
 

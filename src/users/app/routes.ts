@@ -1,6 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { ParamsSchema, UserSchema } from "./schemas";
-import { create } from "ts-node";
 
 export const getUserRoute = createRoute({
   method: "get",
@@ -31,6 +30,9 @@ export const getAllUsersRoute = createRoute({
   method: "get",
   path: "/",
   tags: ["users"],
+  request: {
+    query: UserSchema.pick({ name: true, email: true }).partial(),
+  },
   responses: {
     200: {
       content: {
@@ -48,10 +50,10 @@ export const createUserRoute = createRoute({
   path: "/",
   tags: ["users"],
   request: {
-    body: {  
+    body: {
       content: {
         "application/json": {
-          schema: UserSchema.omit({id: true, createdAt: true, updatedAt: true}),
+          schema: UserSchema.omit({ id: true, createdAt: true, updatedAt: true, deleteAt: true }),
         },
       },
       required: true,
@@ -75,17 +77,17 @@ export const updateUserRoute = createRoute({
   tags: ["users"],
   request: {
     params: ParamsSchema,
-    body: {  
+    body: {
       content: {
         "application/json": {
-          schema: UserSchema.pick({name: true, password: true}),
+          schema: UserSchema.pick({ name: true, password: true }),
         },
       },
       required: true,
       description: "User info to update",
     },
   },
-  responses:{
+  responses: {
     200: {
       content: {
         "application/json": {
@@ -97,20 +99,20 @@ export const updateUserRoute = createRoute({
     404: {
       description: "User not found",
     },
-    500: {  
+    500: {
       description: "Internal server error",
     },
   }
 })
 
-export const deleteUserRoute =  createRoute({
+export const deleteUserRoute = createRoute({
   method: "delete",
   path: "/{id}",
   tags: ["users"],
   request: {
     params: ParamsSchema
   },
-  responses:{
+  responses: {
     200: {
       content: {
         "application/json": {
@@ -122,7 +124,7 @@ export const deleteUserRoute =  createRoute({
     404: {
       description: "User not found",
     },
-    500: {  
+    500: {
       description: "Internal sersver error",
     },
   }

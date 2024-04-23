@@ -15,7 +15,7 @@ const UserSchema = z
     id: z.string().openapi({
       example: "123",
     }),
-    email: z.string().openapi({
+    email: z.string().email().openapi({
       example: "joDoe123@gmail.com",
     }),
     password: z.string().openapi({
@@ -24,13 +24,15 @@ const UserSchema = z
     name: z.string().openapi({
       example: "John Doe",
     }),
-    createdAt: z.coerce.date().openapi({
+    createdAt: z.date().openapi({
       example: "2023-09-07T07:19:51.128Z"
     }),
-    updatedAt: z.coerce.date().openapi({
+    updatedAt: z.date().openapi({
+      example: "2023-09-07T07:19:51.128Z"
+    }),
+    deleteAt: z.date().nullable().openapi({
       example: "2023-09-07T07:19:51.128Z"
     })
-    
   })
   .openapi("User");
 

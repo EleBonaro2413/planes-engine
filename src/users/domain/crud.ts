@@ -1,25 +1,26 @@
 import { ErrorCode } from "~/shared/codeError";
 import { User } from "~/types";
-import { create,getById as getUserById, getAll as getAllUsers, update, delUser, softDelete} from "../repository/database";
+import { create, getById as getUserById, getAll as getAllUsers, update, softDelete } from "../repository/database";
 
-export async function createUser(data: Pick<User, "email"| "name" | "password">){
+export async function createUser(data: Pick<User, "email" | "name" | "password">) {
     const created = await create(data).catch((reason: Error) => {
         throw new ErrorCode(500, "Error at create user")
     })
-        return created           
-    }
+    console.log(created)
+    return created
+}
 export function findUserById(id: string) {
-        return getUserById(id);
-}   
-
-export function findAllUsers(){
-    return getAllUsers()
+    return getUserById(id);
 }
 
-export function updateUser(id: string, data: Pick<User, "name"| "password">){
-        return update(id,data)
+export function findAllUsers({ filters }: { filters: { name?: string } }) {
+    return getAllUsers({ filters })
 }
 
-export function deleteUser(id: string){
+export function updateUser(id: string, data: Pick<User, "name" | "password">) {
+    return update(id, data)
+}
+
+export function deleteUser(id: string) {
     return softDelete(id);
 }
