@@ -11,15 +11,21 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  name           String
-  password       String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  deleteAt       DateTime?
-  leaderOf       Project[] @relation("LeaderOf")
-  collaboratorOf Project[] @relation("CollaboratorOf")
+  id               String          @id @default(cuid())
+  email            String          @unique
+  name             String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deleteAt         DateTime?
+  leaderOf         Project[]       @relation("LeaderOf")
+  collaboratorOf   Project[]       @relation("CollaboratorOf")
+  assignmentArea   AssignmentArea? @relation(fields: [assignmentAreaId], references: [id])
+  assignmentAreaId String?
+  position         String
+  identification   String
+  permissions      Json?
+  avatar           String
+  notifications    Json?
 }
 
 model Project {
@@ -46,4 +52,46 @@ model Procedure {
 
   projectId String
   Project   Project? @relation(fields: [projectId], references: [id])
+}
+
+model Level {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String
+  advance     Int    @default(0)
+  percentage  Int    @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  levelCategoryId String
+  Category        LevelCategory @relation(fields: [levelCategoryId], references: [id])
+
+  PreviousLevelId String? @unique
+  PreviousLevel   Level?  @relation("LevelSequence", fields: [PreviousLevelId], references: [id])
+  NextLevel       Level?  @relation("LevelSequence")
+}
+
+model LevelCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  Levels      Level[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AssignmentArea {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deleteAt    DateTime?
+
+  PreviousAreaId String?         @unique
+  PreviousArea   AssignmentArea? @relation("AreaSequence", fields: [PreviousAreaId], references: [id])
+  NextArea       AssignmentArea? @relation("AreaSequence")
+  User           User[]
 }

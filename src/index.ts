@@ -2,9 +2,9 @@ import { serve } from '@hono/node-server'
 
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
-import { userApp } from "./users/app";
+import { userApp } from "./modules/users/app";
 import { logger } from "hono/logger";
-import { projectsApp } from "./projects/app";
+import { projectsApp } from "./modules/projects/app";
 import { HTTPException } from "hono/http-exception";
 import { Prisma } from "@prisma/client";
 import { env } from 'hono/adapter';
