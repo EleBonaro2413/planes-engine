@@ -37,14 +37,9 @@ export const createProjectRoute = createRoute({
                     schema: ProjectSchema.omit({
                         id: true,
                         createdAt: true,
-                        updatedAt: true, tasks: true, collaborators: true, leader: true
-                    }).extend({
-                        leaderId: z.string()
-                            .openapi({ description: "The leader of the project", example: "a1b2c3d4e5f6g7h8i9j0" }),
-                        collaboratorsIds: z
-                            .array(z.string())
-                            .optional()
-                            .openapi({ description: "The collaborators of the project", example: ["a1b2c3d4e5f6g7h8i9j0"] })
+                        updatedAt: true,
+                        tasks: true,
+                        
                     })
                 },
             },

@@ -5,50 +5,72 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator pothos {
+  provider = "prisma-pothos-types"
+}
+
+generator pothosCrud {
+  provider            = "prisma-generator-pothos-codegen"
+  generatorConfigPath = "./pothos.config.js"
+}
+
 datasource db {
   provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id               String          @id @default(cuid())
-  email            String          @unique
-  name             String
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  deleteAt         DateTime?
-  leaderOf         Project[]       @relation("LeaderOf")
-  collaboratorOf   Project[]       @relation("CollaboratorOf")
+  id             String @id @default(cuid())
+  email          String @unique
+  name           String
+  position       String
+  identification String
+  permissions    Json?
+  avatar         String
+  notifications  Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  leaderOf       Project[] @relation("LeaderOf")
+  collaboratorOf Project[] @relation("CollaboratorOf")
+
   assignmentArea   AssignmentArea? @relation(fields: [assignmentAreaId], references: [id])
   assignmentAreaId String?
-  position         String
-  identification   String
-  permissions      Json?
-  avatar           String
-  notifications    Json?
 }
 
 model Project {
-  id            String      @id @default(cuid())
-  name          String
-  description   String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  procedures    Procedure[]
-  leader        User        @relation("LeaderOf", fields: [leaderId], references: [id])
+  id           String      @id @default(cuid())
+  name         String
+  machineName  String
+  description  String
+  procedures   Procedure[]
+  places       Json
+  transitions  Json
+  requirements Json
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  leader        User   @relation("LeaderOf", fields: [leaderId], references: [id])
   leaderId      String
-  places        Json
-  transitions   Json
-  requirements  Json
-  collaborators User[]      @relation("CollaboratorOf")
+  collaborators User[] @relation("CollaboratorOf")
+
+  level   Level  @relation(fields: [levelId], references: [id])
+  levelId String
 }
 
 model Procedure {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  state     Json
+  id          String @id @default(cuid())
+  name        String
+  machineName String
+  state       Json
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
 
   projectId String
   Project   Project? @relation(fields: [projectId], references: [id])
@@ -57,6 +79,7 @@ model Procedure {
 model Level {
   id          String @id @default(cuid())
   name        String @unique
+  machineName String @unique
   description String
   advance     Int    @default(0)
   percentage  Int    @default(0)
@@ -68,30 +91,43 @@ model Level {
   levelCategoryId String
   Category        LevelCategory @relation(fields: [levelCategoryId], references: [id])
 
-  PreviousLevelId String? @unique
-  PreviousLevel   Level?  @relation("LevelSequence", fields: [PreviousLevelId], references: [id])
-  NextLevel       Level?  @relation("LevelSequence")
+  ParentLevelId String? @unique
+  ParentLevel   Level?  @relation("LevelHierarchy", fields: [ParentLevelId], references: [id])
+  ChildLevels   Level[] @relation("LevelHierarchy")
+
+  Project Project[]
 }
 
 model LevelCategory {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String @id @default(cuid())
+  name        String @unique
+  machineName String @unique
   description String
-  Levels      Level[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  ParentCategoryId String?         @map("parent_category_id")
+  ParentCategory   LevelCategory?  @relation("CategoryHierarchy", fields: [ParentCategoryId], references: [id])
+  ChildCategories  LevelCategory[] @relation("CategoryHierarchy")
+
+  Levels Level[]
 }
 
 model AssignmentArea {
-  id          String    @id @default(cuid())
-  name        String
+  id          String @id @default(cuid())
+  name        String @unique
+  machineName String @unique
   description String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deleteAt    DateTime?
 
-  PreviousAreaId String?         @unique
-  PreviousArea   AssignmentArea? @relation("AreaSequence", fields: [PreviousAreaId], references: [id])
-  NextArea       AssignmentArea? @relation("AreaSequence")
-  User           User[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  ParentAreaId String?          @map("parent_area_id")
+  ParentArea   AssignmentArea?  @relation("AreaHierarchy", fields: [ParentAreaId], references: [id])
+  ChildAreas   AssignmentArea[] @relation("AreaHierarchy")
+
+  User User[]
 }
