@@ -1,11 +1,11 @@
 import { serve } from '@hono/node-server'
 
-import { OpenAPIHono } from "@hono/zod-openapi";
+import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
 import { env } from 'hono/adapter';
 import graphqlApp from './graphql/app';
-const app = new OpenAPIHono();
+const app = new Hono();
 
 app.use("*", async (c, next) => {
   const { OPERATION_SECRET } = env<{ OPERATION_SECRET: string }>(c);
@@ -16,6 +16,7 @@ app.use("*", async (c, next) => {
 
   await next();
 });
+
 app.use("*", logger((strig, ...args) => console.log(strig, ...args)));
 
 app.route("/", graphqlApp);

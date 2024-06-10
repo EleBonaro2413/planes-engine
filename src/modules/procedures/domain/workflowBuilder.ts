@@ -1,9 +1,9 @@
-import { createActor, createMachine } from "xstate";
-import { ErrorCode } from "~/modules/shared/codeError";
+import { createMachine } from "xstate";
 
 type Place = {
     isInitial: boolean
     value: string
+    meta?: Record<string, any>
 }
 
 type Transition = {
@@ -38,14 +38,15 @@ export class WorkflowBuilder {
 
     private composeStates() {
         const states = {} as Record<string, any>
-        this.places.forEach((_, key) => {
+        this.places.forEach(({ meta }, key) => {
             states[key] = {
                 on: {
-                }
+                },
+                meta
             }
         })
         this.transitions.forEach(transition => {
-            states[transition.from].on[transition.event] = transition.to
+            states[transition.from].on[transition.event] = { target: transition.to, guard: 'requirementsCheck' }
         })
 
         for (const key in states) {
@@ -54,27 +55,38 @@ export class WorkflowBuilder {
                 if (Object.keys(element.on).length === 0) {
                     delete states[key].on
                     states[key].type = 'final'
+                } else {
+                    states[key].type = "atomic"
                 }
             }
         }
-
         return states
     }
 
     build() {
         const initialPlace = Array.from(this.places.values()).find(place => place.isInitial)?.value
-        if (!initialPlace) {
-            throw new ErrorCode(500, 'Invalid workflow')
-        }
-
+        console.log({ initialPlace })
         const states = this.composeStates()
-        return createMachine({
+        const machineJson = {
             id: this.id,
             initial: initialPlace,
+            type: "compound",
+            context: {
+                items: [] as string[],
+            },
+            states
+        }
+
+        const machine = createMachine({
+            id: this.id,
+            initial: initialPlace,
+            type: "compound",
             context: {
                 items: [] as string[],
             },
             states
         })
+        return { machine, machineJson }
+
     }
 }

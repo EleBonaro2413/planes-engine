@@ -38,17 +38,21 @@ model User {
 
   assignmentArea   AssignmentArea? @relation(fields: [assignmentAreaId], references: [id])
   assignmentAreaId String?
+  Responsibility   Responsibility? @relation("ResponsibilityCollaborators", fields: [responsibilityId], references: [id])
+  responsibilityId String?
 }
 
 model Project {
   id           String      @id @default(cuid())
   name         String
-  machineName  String
+  machineName  String      @unique
   description  String
+  goal         Int
+  progressUnit String
+  archiveBox   String
+  account      String
   procedures   Procedure[]
-  places       Json
-  transitions  Json
-  requirements Json
+  nodes        Node[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -60,6 +64,59 @@ model Project {
 
   level   Level  @relation(fields: [levelId], references: [id])
   levelId String
+}
+
+enum NodeType {
+  COMMENT
+  NODE
+}
+
+model Node {
+  id          String   @id @default(cuid())
+  label       String
+  description String
+  type        NodeType
+  meta        Json
+  fromArrows  Arrow[]  @relation(name: "SourceNode")
+  toArrows    Arrow[]  @relation(name: "TargetNode")
+  Project     Project? @relation(fields: [projectId], references: [id])
+  projectId   String?
+}
+
+model Arrow {
+  id          String    @id @default(cuid())
+  label       String
+  source      Node      @relation(name: "SourceNode", fields: [sourceId], references: [id])
+  sourceId    String
+  target      Node      @relation(name: "TargetNode", fields: [targetId], references: [id])
+  targetId    String
+  arrowData   ArrowData @relation(fields: [arrowDataId], references: [id])
+  arrowDataId String    @unique
+}
+
+model ArrowData {
+  id               String         @id @default(cuid())
+  requirements     Requirement[]
+  responsability   Responsibility @relation(fields: [responsibilityId], references: [id])
+  responsibilityId String
+  indicators       Json
+  procedure        Json
+  arrow            Arrow?
+}
+
+model Requirement {
+  id          String    @id @default(cuid())
+  label       String
+  machineName String
+  value       Boolean
+  ArrowData   ArrowData @relation(fields: [arrowDataId], references: [id])
+  arrowDataId String
+}
+
+model Responsibility {
+  id            String      @id @default(cuid())
+  collaborators User[]      @relation("ResponsibilityCollaborators")
+  ArrowData     ArrowData[]
 }
 
 model Procedure {

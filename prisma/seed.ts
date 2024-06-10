@@ -2,17 +2,26 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-async function main() {
+async function deleteExistingData() {
     console.log("🧹 Clean database");
+    await prisma.arrow.deleteMany();
+    await prisma.requirement.deleteMany();
+    await prisma.arrowData.deleteMany();
+    await prisma.responsibility.deleteMany();
+    await prisma.node.deleteMany();
+    await prisma.procedure.deleteMany();
+    await prisma.project.deleteMany();
+    await prisma.user.deleteMany();
     await prisma.level.deleteMany();
     await prisma.levelCategory.deleteMany();
     await prisma.assignmentArea.deleteMany();
-    await prisma.user.deleteMany();
+}
 
+async function main() {
+    await deleteExistingData();
     console.log("🌱 Seeding database");
 
     console.log("📊 Seeding Level Category");
-
     const generalLevelCategory = await prisma.levelCategory.create({
         data: {
             name: "General",
@@ -65,7 +74,7 @@ async function main() {
                     machineName: guidingAxesLevelCategory.machineName
                 }
             },
-            PreviousLevel: {
+            ParentLevel: {
                 connect: {
                     machineName: organizationLevel.machineName
                 }
@@ -82,36 +91,13 @@ async function main() {
                     machineName: objectivesLevelCategory.machineName
                 }
             },
-            PreviousLevel: {
+            ParentLevel: {
                 connect: {
                     machineName: serviceAxisLevel.machineName
                 }
             }
         }
     });
-    const operativeProcessesLevel = await prisma.level.create({
-        data: {
-            name: "Procesos Operativos",
-            machineName: "procesos-operativos",
-            description: "Procesos operativos de la organización",
-            Category: {
-                connect: {
-                    machineName: guidingAxesLevelCategory.machineName
-                }
-            },
-            PreviousLevel: {
-                connect: {
-                    machineName: organizationLevel.machineName
-                }
-            }
-        }
-    });
-    console.log({
-        organizationLevel,
-        serviceAxisLevel,
-        firstServiceObjectiveLevel,
-        operativeProcessesLevel
-    })
 
     console.log("👑 Seeding Assignment Area");
     const directionAssignmentArea = await prisma.assignmentArea.create({
@@ -157,12 +143,6 @@ async function main() {
             }
         }
     });
-    console.log({
-        directionAssignmentArea,
-        socialSubdirectionAssignmentArea,
-        technicalDepartmentAssignmentArea,
-        socialDevelopmentDepartmentAssignmentArea,
-    })
 
     console.log("🧍 Seeding users");
     const qUser = await prisma.user.create({
@@ -179,14 +159,137 @@ async function main() {
             }
         }
     });
-    console.log({ qUser });
+
+    console.log("🏗 Seeding Projects");
+    const firstProject = await prisma.project.create({
+        data: {
+            name: "Project 1",
+            machineName: "project_1",
+            description: "This is project 1",
+            goal: 100,
+            progressUnit: "Unit 1",
+            archiveBox: "Box 1",
+            account: "Account 1",
+            leader: {
+                connect: {
+                    id: qUser.id
+                }
+            },
+            level: {
+                connect: {
+                    machineName: firstServiceObjectiveLevel.machineName
+                }
+            }
+        }
+    });
+
+    const costumerCapture = await prisma.node.create({
+        data: {
+            label: "Captacion de clientes",
+            description: "En este paso se captan los clientes que desean vender su propiedad",
+            type: "NODE",
+            meta: {
+                position: {
+                    x: 0,
+                    y: 0,
+                },
+                width: 120,
+                height: 42,
+            },
+            Project: {
+                connect: {
+                    id: firstProject.id
+                }
+            }
+        }
+    });
+
+    const propertyRegister = await prisma.node.create({
+        data: {
+            label: "Registro de propiedad",
+            description: "This is node 2",
+            type: "NODE",
+            meta: {
+                position: {
+                    x: 390,
+                    y: 0,
+                },
+                width: 120,
+                height: 42,
+            },
+            Project: {
+                connect: {
+                    id: firstProject.id
+                }
+            }
+        }
+    });
+
+    const arrowResponsability = await prisma.responsibility.create({
+        data: {
+            collaborators: {
+                connect: {
+                    id: qUser.id
+                }
+            }
+        }
+    });
+
+    const arrowData = await prisma.arrowData.create({
+        data: {
+            id: "arrow_data_1",
+            indicators: {},
+            procedure: {},
+            responsability: {
+                connect: {
+                    id: arrowResponsability.id
+                }
+            },
+            requirements: {
+                createMany: {
+                    data: [
+                        {
+                            label: "Requirement 1",
+                            machineName: "requirement_1",
+                            value: true,
+                        },
+                        {
+                            label: "Requirement 2",
+                            machineName: "requirement_2",
+                            value: false,
+                        }
+                    ]
+                }
+            },
+        }
+    })
+
+    const arrow = await prisma.arrow.create({
+        data: {
+            label: "Cliente Conforme",
+            source: {
+                connect: {
+                    id: costumerCapture.id
+                }
+            },
+            target: {
+                connect: {
+                    id: propertyRegister.id
+                }
+            },
+            arrowData: {
+                connect: {
+                    id: arrowData.id
+                }
+            },
+        }
+    });
 }
 
 main()
-    .then(async () => {
-        await prisma.$disconnect()
+    .catch((e) => {
+        console.error(e);
     })
-    .catch(async (e) => {
-        console.error(e)
-        await prisma.$disconnect()
-    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });
