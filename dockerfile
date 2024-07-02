@@ -34,10 +34,13 @@ COPY . .
 RUN yarn build
 
 # Final production image with minimal footprint
+# @TODO: Use a smaller base image
 FROM base
 
 WORKDIR /myapp
+# @TODO: Review which files are needed in the final image (e.g. prisma/schema.prisma)
 COPY --from=prod-dependencies /myapp/node_modules /myapp/node_modules
 COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma
 COPY --from=build /myapp /myapp
-CMD ["yarn", "run", "dev"]
+# Review how to run the application in production (Because the application is built in the build stage, we can run the application directly in the final image) ref
+CMD ["node", "dist/index.js"]
