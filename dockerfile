@@ -1,5 +1,5 @@
 # Base image with Node.js and system dependencies
-FROM node:20.12.2 as base
+FROM node:22.3.0-slim as base
 
 ENV NODE_ENV production
 
@@ -16,7 +16,6 @@ RUN yarn install --production=false
 
 # Stage for installing production dependencies
 FROM dev-dependencies as prod-dependencies
-
 RUN yarn install --production=false
 
 # Stage for building the application
