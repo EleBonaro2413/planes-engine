@@ -30,7 +30,7 @@ jobs:
         push: true
         tags: |
           duranhub/duranhub-planesengine:latest 
-          duranhub/duranhub-planesengine:latest:${{ github.sha }}
+          duranhub/duranhub-planesengine:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-22.04
