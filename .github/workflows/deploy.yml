@@ -22,6 +22,12 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+    - id: vars
+      name: Set Short Git Commit SHA
+      run: |
+        shortSHA=$(git rev-parse --short ${{ github.sha }})
+        echo "short_sha=$shortSHA" >> $GITHUB_OUTPUT
+
     - name: Build and push Docker image to Docker Hub
       uses: docker/build-push-action@v5
       with:
@@ -29,7 +35,7 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:latest 
+          ${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:latest
           ${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:${{ steps.vars.outputs.short_sha }}
 
   deploy:
@@ -51,7 +57,6 @@ jobs:
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
 
     - name: Configure gcloud CLI
       run: |
@@ -62,7 +67,7 @@ jobs:
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy your-service-name \
-          --image docker.io/duranhub/duranhub-planesengine:latest \
+          --image docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:latest \
           --platform managed \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated
