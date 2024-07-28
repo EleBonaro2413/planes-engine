@@ -35,8 +35,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:latest
-          ${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:${{ steps.vars.outputs.short_sha }}
+          duranhub/duranhub-planesengine:latest
+          duranhub/duranhub-planesengine:${{ steps.vars.outputs.short_sha }}
 
   deploy:
     runs-on: ubuntu-22.04
