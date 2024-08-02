@@ -36,7 +36,6 @@ jobs:
         push: true
         tags: |
           duranhub/duranhub-planesengine:latest
-          duranhub/duranhub-planesengine:${{ steps.vars.outputs.short_sha }}
 
   deploy:
     runs-on: ubuntu-22.04
