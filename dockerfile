@@ -42,4 +42,7 @@ COPY --from=prod-dependencies /myapp/node_modules /myapp/node_modules
 COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma
 COPY --from=build /myapp /myapp
 # Review how to run the application in production (Because the application is built in the build stage, we can run the application directly in the final image) ref
+
+EXPOSE 3004
+
 CMD ["node", "dist/index.js"]
