@@ -35,7 +35,7 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: |
-          duranhub/duranhub-planesengine:latest
+          docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/duranhub/duranhub-planesengine:latest
 
   deploy:
     runs-on: ubuntu-22.04
